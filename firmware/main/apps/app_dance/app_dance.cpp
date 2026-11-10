@@ -13,6 +13,7 @@
 
 using namespace mooncake;
 using namespace stackchan;
+LV_FONT_DECLARE(grok_status_24);
 
 AppDance::AppDance()
 {
@@ -54,7 +55,7 @@ void AppDance::onOpen()
 
     // Create default avatar
     auto avatar = std::make_unique<avatar::DefaultAvatar>();
-    avatar->init(lv_screen_active());
+    avatar->init(lv_screen_active(), &grok_status_24);
     GetStackChan().attachAvatar(std::move(avatar));
 
     /* ------------------------------- BLE events ------------------------------- */
@@ -64,7 +65,7 @@ void AppDance::onOpen()
             return;
         }
         _ble_avatar_data.update_flag = true;
-        _ble_avatar_data.data_ptr    = (char*)data;
+        _ble_avatar_data.data        = data;
     });
 
     GetHAL().onBleMotionData.connect([&](const char* data) {
@@ -73,7 +74,7 @@ void AppDance::onOpen()
             return;
         }
         _ble_motion_data.update_flag = true;
-        _ble_motion_data.data_ptr    = (char*)data;
+        _ble_motion_data.data        = data;
     });
 
     GetHAL().onBleRgbData.connect([&](const char* data) {
@@ -82,7 +83,7 @@ void AppDance::onOpen()
             return;
         }
         _ble_rgb_data.update_flag = true;
-        _ble_rgb_data.data_ptr    = (char*)data;
+        _ble_rgb_data.data        = data;
     });
 
     /* ----------------------------- Common widgets ----------------------------- */
@@ -97,22 +98,22 @@ void AppDance::onRunning()
     LvglLockGuard lvgl_lock;
 
     if (_ble_avatar_data.update_flag) {
-        GetStackChan().updateAvatarFromJson(_ble_avatar_data.data_ptr);
+        GetStackChan().updateAvatarFromJson(_ble_avatar_data.data.c_str());
         _ble_avatar_data.update_flag = false;
-        _ble_avatar_data.data_ptr    = nullptr;
+        _ble_avatar_data.data.clear();
     }
 
     if (_ble_motion_data.update_flag) {
         check_auto_angle_sync_mode();
-        GetStackChan().updateMotionFromJson(_ble_motion_data.data_ptr);
+        GetStackChan().updateMotionFromJson(_ble_motion_data.data.c_str());
         _ble_motion_data.update_flag = false;
-        _ble_motion_data.data_ptr    = nullptr;
+        _ble_motion_data.data.clear();
     }
 
     if (_ble_rgb_data.update_flag) {
-        GetStackChan().updateNeonLightFromJson(_ble_rgb_data.data_ptr);
+        GetStackChan().updateNeonLightFromJson(_ble_rgb_data.data.c_str());
         _ble_rgb_data.update_flag = false;
-        _ble_rgb_data.data_ptr    = nullptr;
+        _ble_rgb_data.data.clear();
     }
 
     GetStackChan().update();
@@ -132,6 +133,7 @@ void AppDance::onClose()
 
         GetHAL().onBleAvatarData.clear();
         GetHAL().onBleMotionData.clear();
+        GetHAL().onBleRgbData.clear();
 
         view::destroy_home_indicator();
         view::destroy_status_bar();

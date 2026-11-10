@@ -85,6 +85,16 @@ public:
         }
     }
 
+    // Optional caption supplied by clients (e.g. the agent name above its face).
+    virtual void setTitle(std::string_view text)
+    {
+    }
+
+    // Optional status display; unsupported skins leave the normal avatar visible.
+    virtual void setStatusView(std::string_view skin, std::string_view state, std::string_view text)
+    {
+    }
+
     void clearSpeech()
     {
         if (getKeyElements().speechBubble) {

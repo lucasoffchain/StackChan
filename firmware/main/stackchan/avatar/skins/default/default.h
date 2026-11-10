@@ -6,6 +6,7 @@
 #pragma once
 #include "../../avatar/avatar.h"
 #include "../../avatar/elements/feature.h"
+#include "../grok/grok_status_view.h"
 #include <lvgl.h>
 #include <smooth_lvgl.hpp>
 #include <memory>
@@ -22,10 +23,14 @@ public:
     lv_color_t secondaryColor = lv_color_black();
 
     void init(lv_obj_t* parent, const lv_font_t* font = &lv_font_montserrat_16);
+    void setTitle(std::string_view text) override;
+    void setStatusView(std::string_view skin, std::string_view state, std::string_view text) override;
     uitk::lvgl_cpp::Container* getPanel() const;
 
 private:
     std::unique_ptr<uitk::lvgl_cpp::Container> _pannel;
+    std::unique_ptr<uitk::lvgl_cpp::Label> _title;
+    std::unique_ptr<GrokStatusView> _status_view;
 };
 
 /**

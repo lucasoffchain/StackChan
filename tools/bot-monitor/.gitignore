@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+status.json
+status.json.*.lock
+status.json.lock
+.cache/

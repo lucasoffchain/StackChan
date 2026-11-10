@@ -6,6 +6,8 @@ Here are StackChan related open-source resources, including source code of the S
 
 Update of this repo could be a little late than the released firmware and mobile app. 
 
+For monitoring Grok Build over a computer's Bluetooth connection, see [the BLE status bridge](tools/bot-monitor/README.md).
+
 ----
 
 <img src="https://cdn.shopify.com/s/files/1/0056/7689/2250/files/5a589623895f65487717894d9240f6b8.png" width="60%">

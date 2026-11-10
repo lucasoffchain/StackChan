@@ -51,6 +51,37 @@ void update_from_json(Avatar* avatar, const char* jsonContent)
         return;
     }
 
+    // Optional fields: legacy clients still send just eyes and mouth.
+    if (doc["title"].is<const char*>()) {
+        const auto title = doc["title"].as<std::string>();
+        if (title.size() <= 48) {
+            avatar->setTitle(title);
+        }
+    }
+    // Text is owned by the JsonDocument for this call; setSpeech copies it to LVGL.
+    if (doc["speech"].is<const char*>()) {
+        const auto speech = doc["speech"].as<std::string>();
+        // Keep status messages short and do not truncate inside a UTF-8 character.
+        if (speech.size() <= 192) {
+            avatar->setSpeech(speech);
+        }
+    }
+    if (doc["modifyLock"].is<bool>()) {
+        avatar->setModifyLock(doc["modifyLock"].as<bool>());
+    }
+
+    if (doc["monitor"].is<ArduinoJson::JsonObject>()) {
+        const auto monitor = doc["monitor"].as<ArduinoJson::JsonObject>();
+        if (monitor["skin"].is<const char*>()) {
+            const auto skin = monitor["skin"].as<std::string>();
+            const auto state = monitor["state"].is<const char*>() ? monitor["state"].as<std::string>() : "unknown";
+            const auto text = monitor["text"].is<const char*>() ? monitor["text"].as<std::string>() : "Unknown";
+            if (skin.size() <= 16 && state.size() <= 16 && text.size() <= 192) {
+                avatar->setStatusView(skin, state, text);
+            }
+        }
+    }
+
     if (doc["leftEye"].is<ArduinoJson::JsonObject>()) {
         ArduinoJson::JsonObject leftEyeObj = doc["leftEye"];
         update_feature(avatar->leftEye(), leftEyeObj);
